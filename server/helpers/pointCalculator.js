@@ -4,7 +4,7 @@ let Team = require('../models/team');
 
 let calculatePoints = (options) => {
     let steps = options.steps;
-    let points;
+    let points = 0;
 
     for (mark of marks.soloMarks) {
         if(mark[0] <= steps) {
@@ -30,33 +30,36 @@ let calculateTotalsSolo = async (id) => {
 
 let calculateTotalsTeam = async (id, myId) => {
     let players = await Player.find({team: id});
+    let initialPlayer = await Player.findOne({_id: myId})
     let team = await Team.findOne({_id: id});
 
     let currentTotalSteps = team.total_steps;
     if(!players) return;
     let steps = 0;
     let points = 0;
-    let myRes = {};
+    let pointsList = {}
 
-    for (entry of currentTotalSteps) {
-        let totalStepsSingleDay = 0;
-
-        for (let player of players) {
-            for (node of player.total_steps) {
-                if(entry.date.getTime() == node.date.getTime()) {
-                    totalStepsSingleDay += node.steps;
-                }
-                else {
-                    currentTotalSteps.push({
-                        date: node.date,
-                        steps: node.steps,
-                        points: 0
-                      });
-                }
+    for (let player of players) {
+        for (node of player.total_steps) {
+            if (pointsList.hasOwnProperty(node.date)) {
+                pointsList[node.date] += node.steps;
+            } else {
+                pointsList[node.date] = node.steps;
             }
-        }    
-        entry.steps = totalStepsSingleDay;
+        }
     }
+    console.log(pointsList);   
+
+    if (currentTotalSteps.length == 0) {
+        currentTotalSteps = [...initialPlayer.total_steps];
+    }
+
+    for (const [key, value] of Object.entries(pointsList)) {
+        currentTotalSteps.some((item) => { item.date == key ? item.steps = value : false})
+      }
+   
+
+    console.log(currentTotalSteps)
 
     for (entry of currentTotalSteps) {
         steps += entry.steps;
@@ -70,7 +73,7 @@ let calculateTotalsTeam = async (id, myId) => {
     }
      
     await Team.updateOne({_id: id}, {steps: steps, points: points, total_steps: currentTotalSteps});
-    return myRes;
+    return {steps: steps, points: points, total_steps: currentTotalSteps};
 }
 
 let leaderboardComparator = (a, b) => {
