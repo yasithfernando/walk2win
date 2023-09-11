@@ -1,5 +1,4 @@
 let Player = require("../models/player");
-let Team = require("../models/team");
 let pointCalc = require("../helpers/pointCalculator");
 let bonusCalc = require("../helpers/bonusPointsCalculator");
 
@@ -111,7 +110,6 @@ module.exports.syncSteps = async (req, res) => {
     }
   }
 
-  console.log(totalSteps);
   let steps =0 
   let points = 0;
 
@@ -131,16 +129,14 @@ module.exports.syncSteps = async (req, res) => {
   let sync = {
     sync: false
   };
-  if(player.team)
+  if(player.team) 
     sync = await pointCalc.calculateTotalsTeam(player.team, player.id);
   else
     sync = await pointCalc.calculateTotalsSolo(player.id);
-  //console.log(sync);
+  console.log(sync);
   res.json(sync);
 
 };
-
-
 
 module.exports.playerSync = function(req, res) {
   let playerGmail = req.headers.gmail;
