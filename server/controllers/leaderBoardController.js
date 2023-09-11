@@ -45,7 +45,7 @@ module.exports.topPlayersData = (req, res) => {
             return;
         }
         res.json({
-            total_steps: player.total_steps !== null ? player.total_steps.sort((a, b) => new Date(b.date) - new Date(a.date)) : [],
+            total_steps: player?.total_steps ? player.total_steps.sort((a, b) => new Date(b.date) - new Date(a.date)) : [],
             steps: player.steps,
             points: player.points
         });
