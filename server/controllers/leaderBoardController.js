@@ -3,7 +3,7 @@ let Player = require('../models/player');
 let leaderboardComparator = require('../helpers/pointCalculator').leaderboardComparator;
 
 module.exports.topTeams = (req, res) => {    
-    Team.find({}, (error, teams) => {
+    Team.find({}, (error, teams = []) => {
         res.json(teams.sort(leaderboardComparator));
     })
 }
