@@ -111,9 +111,21 @@ module.exports.syncSteps = async (req, res) => {
     }
   }
 
+  console.log(totalSteps);
+  let steps =0 
+  let points = 0;
+
+  for (let entry of totalSteps) {
+    steps += entry.steps;
+    points += entry.points;
+  }
+
+  console.log(steps, points);
 
   await Player.updateOne({_id: player.id}, {
-    total_steps: totalSteps
+    total_steps: totalSteps,
+    steps: steps,
+    points: points
   });
 
   let sync = {
@@ -123,7 +135,7 @@ module.exports.syncSteps = async (req, res) => {
     sync = await pointCalc.calculateTotalsTeam(player.team, player.id);
   else
     sync = await pointCalc.calculateTotalsSolo(player.id);
-  console.log(sync);
+  //console.log(sync);
   res.json(sync);
 
 };
