@@ -29,51 +29,74 @@ let calculateTotalsSolo = async (id) => {
 
 
 let calculateTotalsTeam = async (id, myId) => {
-    let players = await Player.find({team: id});
-    let initialPlayer = await Player.findOne({_id: myId})
-    let team = await Team.findOne({_id: id});
+  let players = await Player.find({ team: id });
+  let initialPlayer = await Player.findOne({ _id: myId });
+  let team = await Team.findOne({ _id: id });
 
-    let currentTotalSteps = team.total_steps;
-    if(!players) return;
-    let steps = 0;
-    let points = 0;
-    let pointsList = {}
+  let currentTotalSteps = team.total_steps;
+  if (!players) return;
+  let steps = 0;
+  let points = 0;
+  let pointsList = {};
 
-    for (let player of players) {
-        for (node of player.total_steps) {
-            if (pointsList.hasOwnProperty(node.date)) {
-                pointsList[node.date] += node.steps;
-            } else {
-                pointsList[node.date] = node.steps;
-            }
-        }
-    }
-    console.log(pointsList);   
-
-    if (currentTotalSteps.length == 0) {
-        currentTotalSteps = [...initialPlayer.total_steps];
-    }
-
-    for (const [key, value] of Object.entries(pointsList)) {
-        currentTotalSteps.some((item) => { item.date == key ? item.steps = value : false})
+  for (let player of players) {
+    for (node of player.total_steps) {
+      if (pointsList.hasOwnProperty(node.date)) {
+        pointsList[node.date] += node.steps;
+      } else {
+        pointsList[node.date] = node.steps;
       }
-   
-
-    console.log(currentTotalSteps)
-
-    for (entry of currentTotalSteps) {
-        steps += entry.steps;
-        for (mark of marks.teamMarks) {
-            if(mark[0] <= entry.steps) {
-                entry.points = mark[1];
-                break;
-            }
-        }
-        points += entry.points;
     }
-     
-    await Team.updateOne({_id: id}, {steps: steps, points: points, total_steps: currentTotalSteps});
-    return {steps: steps, points: points, total_steps: currentTotalSteps};
+  }
+  console.log(pointsList);
+
+  if (currentTotalSteps.length == 0) {
+    currentTotalSteps = [...initialPlayer.total_steps];
+  }
+
+  for (const [key, value] of Object.entries(pointsList)) {
+    currentTotalSteps.some((item) => {
+      item.date == key ? (item.steps = value) : false;
+    });
+  }
+
+  // ...
+
+  // Iterate through the pointsList and update currentTotalSteps
+
+//   for (const [key, value] of Object.entries(pointsList)) {
+//     const existingEntry = currentTotalSteps.find((item) => item.date === key);
+//     if (existingEntry) {
+//       // If an entry with the same date exists in currentTotalSteps, add the value to it
+//       existingEntry.steps += value;
+//     } else {
+//       // If no entry with the same date exists, create a new entry and add it to currentTotalSteps
+//       currentTotalSteps.push({ date: key, steps: value });
+//     }
+//   }
+
+  console.log(currentTotalSteps);
+
+  // ...
+
+  console.log(currentTotalSteps);
+
+  for (entry of currentTotalSteps) {
+    steps += entry.steps;
+    for (mark of marks.teamMarks) {
+      if (mark[0] <= entry.steps) {
+        entry.points = mark[1];
+        break;
+      }
+    }
+    points += entry.points;
+  }
+
+  await Team.updateOne(
+    { _id: id },
+    { steps: steps, points: points, total_steps: currentTotalSteps }
+  );
+  return { steps: steps, points: points, total_steps: currentTotalSteps };
 }
 
 let leaderboardComparator = (a, b) => {
