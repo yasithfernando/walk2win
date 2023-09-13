@@ -20,7 +20,8 @@ if(process.env.NODE_ENV === 'test'){
   
 }else{
   mongoose.connect(process.env.MONGO_STR, {
-    useNewUrlParser: true
+    useNewUrlParser: true,
+    useUnifiedTopology:true 
   });
 }
 
