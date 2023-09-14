@@ -50,7 +50,7 @@ let calculateTotalsTeam = async (id, myId) => {
     }
     console.log(pointsList);   
 
-    if (currentTotalSteps.length == 0) {
+    if (initialPlayer.total_steps.length > currentTotalSteps.length) {
         currentTotalSteps = [...initialPlayer.total_steps];
     }
 
