@@ -20,7 +20,8 @@ if(process.env.NODE_ENV === 'test'){
   
 }else{
   mongoose.connect(process.env.MONGO_STR, {
-    useNewUrlParser: true
+    useNewUrlParser: true,
+    useUnifiedTopology:true 
   });
 }
 
@@ -29,7 +30,7 @@ const app = express();
 app.use(express.static("../client/dist/walk2win"));
 app.use(bodyParser.json());
 
-app.use(cors());
+app.use(cors(process.env.CORS_OPTIONS));
 app.use(expresValidator());
 app.use(leaderBoardRouter);
 app.use(syncRouter);

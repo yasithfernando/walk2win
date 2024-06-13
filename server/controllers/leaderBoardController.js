@@ -3,7 +3,7 @@ let Player = require('../models/player');
 let leaderboardComparator = require('../helpers/pointCalculator').leaderboardComparator;
 
 module.exports.topTeams = (req, res) => {    
-    Team.find({}, (error, teams) => {
+    Team.find({}, (error, teams = []) => {
         res.json(teams.sort(leaderboardComparator));
     })
 }
@@ -45,9 +45,9 @@ module.exports.topPlayersData = (req, res) => {
             return;
         }
         res.json({
-            total_steps: player.total_steps.sort((a, b) => new Date(b.date) - new Date(a.date)),
-            steps: player.steps,
-            points: player.points
+            total_steps: player?.total_steps ? player.total_steps.sort((a, b) => new Date(b.date) - new Date(a.date)) : [],
+            steps: player?.steps ? player.steps : 0,
+            points: player?.points ? player.points : 0
         });
     })
 }
